@@ -1,6 +1,7 @@
 {
   "name": "gridify",
   "version": "0.1",
+  "main": ["src/gridify.js"],
   "dependencies": {
     "velocity": "~1.2.2",
     "jquery": "~2.1.3"
