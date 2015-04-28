@@ -3,7 +3,9 @@
   "version": "0.1",
   "main": ["dist/jquery.gridify.js","dist/jquery.gridify.min.js"],
   "ignore":[
-    "**/*"
+    "**/.*",
+    "src",
+    "test"
   ],
   "dependencies": {
     "velocity": "~1.2.2",
