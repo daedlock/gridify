@@ -9,7 +9,6 @@
   "dependencies": {
     "velocity": "~1.2.2",
     "jquery": "~2.1.3"
-
   },
   "devDependencies": {
     "qunit": "~1.12.0"
