@@ -1,7 +1,9 @@
 {
   "name": "gridify",
   "version": "0.1",
-  "dependencies": {},
+  "dependencies": {
+    "velocity": "~1.2.2"
+  },
   "devDependencies": {
     "qunit": "~1.12.0",
     "jquery": "~2.1.3"

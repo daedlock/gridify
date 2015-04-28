@@ -1,13 +1,12 @@
 /*
- *
- *
- *
  * Copyright (c) 2015 Hossam Saraya
  * Licensed under the MIT license.
  */
+
 (function ($) {
 
-  $.fn.pageCarousel = function (options) {
+  //"use strict";
+  $.fn.gridify = function (options) {
 
     var DEFAULTS = {
       arrows: {
@@ -23,7 +22,7 @@
       },
       onBeforePageSlide: function (i,j) {
       }
-    }
+    };
 
     var settings = $.extend({}, DEFAULTS, options);
     var gridRoot = this;
@@ -44,19 +43,19 @@
       $(document).keydown(function(e) {
         switch(e.which) {
           case 37: // left
-            moveToPage(currentIndex.i,currentIndex.j-1)
+            window.moveToPage(currentIndex.i,currentIndex.j-1);
             break;
 
           case 38: // up
-            moveToPage(currentIndex.i-1,currentIndex.j)
+            window.moveToPage(currentIndex.i-1,currentIndex.j);
             break;
 
           case 39: // right
-            moveToPage(currentIndex.i,currentIndex.j+1)
+            window.moveToPage(currentIndex.i,currentIndex.j+1);
             break;
 
           case 40: // down
-            moveToPage(currentIndex.i+1,currentIndex.j)
+            window.moveToPage(currentIndex.i+1,currentIndex.j);
             break;
 
           default: return; // exit this handler for other keys
@@ -68,12 +67,11 @@
 
     //Reposition and Resize pages to adapt to current viewport w/h
     var redraw = function () {
-      console.log(currentIndex)
-      cameraPosition.x = -currentIndex.j * window.innerWidth
-      cameraPosition.y = -currentIndex.i * window.innerHeight
+      cameraPosition.x = -currentIndex.j * window.innerWidth;
+      cameraPosition.y = -currentIndex.i * window.innerHeight;
       gridRoot.css({
         transform: "translateX("+ cameraPosition.x +"px) translateY("+cameraPosition.y+"px)"
-      })
+      });
 
 
       return pages.each(function (i, el) {
@@ -82,6 +80,9 @@
         //y
         // floor i / 3 -> [0,0] [1,0] [2,0] [3,1]
         $(el).css({
+          position: "fixed",
+          overflow: "scroll",
+          zIndex: -1,
           top: Math.floor(i/settings.pagesPerRow) * window.innerHeight,
           bottom: 0,
           left: ((i%settings.pagesPerRow) * window.innerWidth),
@@ -89,13 +90,14 @@
           minHeight: window.innerHeight
         });
       });
-    }
+    };
 
     window.moveToPage = function(i,j){
 
       //Boundary check
-      if(i<0 || j<0 || j+1 > settings.pagesPerRow || i+1 > Math.ceil(pages.length/settings.pagesPerRow))
+      if(i<0 || j<0 || j+1 > settings.pagesPerRow || i+1 > Math.ceil(pages.length/settings.pagesPerRow)){
         return false;
+      }
 
       settings.onBeforePageSlide(currentIndex.i,currentIndex.j);
 
@@ -108,8 +110,8 @@
       currentIndex.i = i;
 
       body.velocity({
-          scale: .7,
-          opacity: .7
+          scale: 0.7,
+          opacity: 0.7
         },
         {
 
@@ -124,7 +126,7 @@
         translateY: cameraPosition.y
       }, {
         delay: 300,
-        easing: [.71, -0.58, .29, 1.57]
+        easing: [0.71, -0.58, 0.29, 1.57]
       });
 
       body.velocity({
@@ -142,27 +144,23 @@
       },{
         delay:360
       });
-    }
+    };
 
-    redraw()
+    redraw();
 
     $(window).resize(function () {
       redraw();
-    })
+    });
 
     $(".arrow").click(function () {
-
       //Callback
-
-
-
     });
 
     return this;
   };
 
 
-  $(".grid-pages").pageCarousel({
+  $(".grid-pages").gridify({
     pagesPerRow:2,
     onAfterPageSlide: function (i,j) {
     }
