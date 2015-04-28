@@ -159,12 +159,5 @@
     return this;
   };
 
-
-  $(".grid-pages").gridify({
-    pagesPerRow:2,
-    onAfterPageSlide: function (i,j) {
-    }
-  });
-
 }(jQuery));
 
