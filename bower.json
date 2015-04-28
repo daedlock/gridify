@@ -1,10 +1,9 @@
 {
   "name": "gridify",
-  "version": "0.1",
+  "version": "1.0.0",
   "main": ["dist/jquery.gridify.js","dist/jquery.gridify.min.js"],
   "ignore":[
     "**/.*",
-    "src",
     "test"
   ],
   "dependencies": {
