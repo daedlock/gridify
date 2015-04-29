@@ -92,8 +92,11 @@
       });
     };
 
+    //TODO: change this to $.fn.gridify('move',i,j)
     window.moveToPage = function(i,j){
 
+
+      //TODO: Double Check
       //Boundary check
       if(i<0 || j<0 || j+1 > settings.pagesPerRow || i+1 > Math.ceil(pages.length/settings.pagesPerRow)){
         return false;
@@ -121,6 +124,10 @@
         opacity:0
       });
 
+      pages.velocity({
+        scale:.95
+      });
+
       gridRoot.velocity({
         translateX: cameraPosition.x,
         translateY: cameraPosition.y
@@ -139,6 +146,13 @@
         }
       });
 
+
+      pages.velocity({
+        scale:1
+      }, {
+        delay:300
+      });
+
       arrows.velocity({
         opacity:1
       },{
@@ -150,10 +164,6 @@
 
     $(window).resize(function () {
       redraw();
-    });
-
-    $(".arrow").click(function () {
-      //Callback
     });
 
     return this;
