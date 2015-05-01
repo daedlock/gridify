@@ -1,7 +1,7 @@
 /*
  * Copyright (c) 2015 Hossam Saraya
  * Licensed under the MIT license.
- */
+*/
 
 (function ($) {
 
@@ -23,7 +23,6 @@
       onBeforePageSlide: function (i,j) {
       }
     };
-
     var settings = $.extend({}, DEFAULTS, options);
     var gridRoot = this;
     var body = $("body");
@@ -65,34 +64,8 @@
     }
 
 
-    //Reposition and Resize pages to adapt to current viewport w/h
-    var redraw = function () {
-      cameraPosition.x = -currentIndex.j * window.innerWidth;
-      cameraPosition.y = -currentIndex.i * window.innerHeight;
-      gridRoot.css({
-        transform: "translateX("+ cameraPosition.x +"px) translateY("+cameraPosition.y+"px)"
-      });
 
 
-      return pages.each(function (i, el) {
-        //x
-        // i % 3
-        //y
-        // floor i / 3 -> [0,0] [1,0] [2,0] [3,1]
-        $(el).css({
-          position: "fixed",
-          overflow: "scroll",
-          zIndex: -1,
-          top: Math.floor(i/settings.pagesPerRow) * window.innerHeight,
-          bottom: 0,
-          left: ((i%settings.pagesPerRow) * window.innerWidth),
-          width: window.innerWidth,
-          minHeight: window.innerHeight
-        });
-      });
-    };
-
-    //TODO: change this to $.fn.gridify('move',i,j)
     window.moveToPage = function(i,j){
 
 
@@ -160,7 +133,32 @@
       });
     };
 
-    redraw();
+    //Reposition and Resize pages to adapt to current viewport w/h. Called once after init
+    var redraw = function () {
+      cameraPosition.x = -currentIndex.j * window.innerWidth;
+      cameraPosition.y = -currentIndex.i * window.innerHeight;
+      gridRoot.css({
+        transform: "translateX("+ cameraPosition.x +"px) translateY("+cameraPosition.y+"px)"
+      });
+
+
+      return pages.each(function (i, el) {
+        //x
+        // i % 3
+        //y
+        // floor i / 3 -> [0,0] [1,0] [2,0] [3,1]
+        $(el).css({
+          position: "fixed",
+          overflow: "scroll",
+          zIndex: -1,
+          top: Math.floor(i/settings.pagesPerRow) * window.innerHeight,
+          bottom: 0,
+          left: ((i%settings.pagesPerRow) * window.innerWidth),
+          width: window.innerWidth,
+          minHeight: window.innerHeight
+        });
+      });
+    }();
 
     $(window).resize(function () {
       redraw();
