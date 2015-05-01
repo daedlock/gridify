@@ -68,7 +68,7 @@ var grid = new $.Gridify($(".yourSelector"));
 or
 
 ```
-var grid = new $.Gridify($(".grid-pages"),{
+var grid = new $.Gridify($(".yourSelector"),{
 	//options
 });
 
