@@ -2,144 +2,153 @@
 * Copyright (c) 2015 Hossam Saraya; Licensed MIT */
 (function ($) {
 
-  //"use strict";
-  $.fn.gridify = function (options) {
-
-    var DEFAULTS = {
-      arrows: {
-        left: ".arrow",
+  //Create once
+  var defaults = {
+    arrows: {
+      left: ".arrow",
         right: ".arrow",
         top: ".arrow",
         bottom: ".arrow"
-      },
-      pageSelector: ".page",
+    },
+    pageSelector: ".page",
       pagesPerRow: 3,
       arrowKeysEnabled: true,
-      onAfterPageSlide: function (i,j) {
-      },
-      onBeforePageSlide: function (i,j) {
-      }
-    };
-    var settings = $.extend({}, DEFAULTS, options);
-    var gridRoot = this;
-    var body = $("body");
-    var arrows = $([settings.arrows.left,settings.arrows.right,settings.arrows.top,settings.arrows.bottom].join(","));
-    var cameraPosition = {
-      x: 0,
-      y: 0
-    };
-    var currentIndex = {
-      i: 0,
-      j: 0
-    };
-    var pages = gridRoot.find(settings.pageSelector);
-
-    //Bind keys
-    if(settings.arrowKeysEnabled){
-      $(document).keydown(function(e) {
-        switch(e.which) {
-          case 37: // left
-            window.moveToPage(currentIndex.i,currentIndex.j-1);
-            break;
-
-          case 38: // up
-            window.moveToPage(currentIndex.i-1,currentIndex.j);
-            break;
-
-          case 39: // right
-            window.moveToPage(currentIndex.i,currentIndex.j+1);
-            break;
-
-          case 40: // down
-            window.moveToPage(currentIndex.i+1,currentIndex.j);
-            break;
-
-          default: return; // exit this handler for other keys
-        }
-        e.preventDefault(); // prevent the default action (scroll / move caret)
-      });
+      onAfterPageSlide: function (i, j) {
+    },
+    onBeforePageSlide: function (i, j) {
     }
+  };
 
+  var Gridify = function (el, options) {
+    this.settings = $.extend({}, defaults, options);
+    this.gridRoot = el;
+    this.init();
+  }
 
+  Gridify.prototype = {
+    /* Initialization variables */
+    initData: function () {
+      this.body = $("body");
+      this.arrows = $([this.settings.arrows.left, this.settings.arrows.right, this.settings.arrows.top, this.settings.arrows.bottom].join(","));
+      this.cameraPosition = {
+        x: 0,
+        y: 0
+      };
+      this.currentIndex = {
+        i: 0,
+        j: 0
+      };
+      this.pages = this.gridRoot.find(this.settings.pageSelector);
+    },
 
+    /* Initialization logic */
+    init: function () {
+      this.initData();
+      this.bindArrowKeys();
+      this.redraw();
+      var self = this;
+      $(window).resize(function () {
+        self.redraw();
+      });
+    },
 
-    window.moveToPage = function(i,j){
+    /* Binds keyboard up,left,right,down to moveTo method */
+    bindArrowKeys: function () {
+      if (this.settings.arrowKeysEnabled) {
+        var self = this;
+        $(document).keydown(function (e) {
+          switch (e.which) {
+            case 37: // left
+              self.moveToPage(self.currentIndex.i, self.currentIndex.j - 1);
+              break;
 
+            case 38: // up
+              self.moveToPage(self.currentIndex.i - 1, self.currentIndex.j);
+              break;
 
+            case 39: // right
+              self.moveToPage(self.currentIndex.i, self.currentIndex.j + 1);
+              break;
+
+            case 40: // down
+              self.moveToPage(self.currentIndex.i + 1, self.currentIndex.j);
+              break;
+
+            default:
+              return; // exit this handler for other keys
+          }
+          e.preventDefault(); // prevent the default action (scroll / move caret)
+        });
+      }
+    },
+
+    /* Moves the camera to the page of index i,j */
+    moveToPage: function (i, j) {
       //TODO: Double Check
       //Boundary check
-      if(i<0 || j<0 || j+1 > settings.pagesPerRow || i+1 > Math.ceil(pages.length/settings.pagesPerRow)){
+      if (i < 0 || j < 0 || j + 1 > this.settings.pagesPerRow || i + 1 > Math.ceil(this.pages.length / this.settings.pagesPerRow)) {
         return false;
       }
+      this.settings.onBeforePageSlide(this.currentIndex.i, this.currentIndex.j);
+      var w = window.innerWidth, h = window.innerHeight;
+      var self=this;
+      this.cameraPosition.x = -j * w;
+      this.cameraPosition.y = -i * h;
+      this.currentIndex.j = j;
+      this.currentIndex.i = i;
 
-      settings.onBeforePageSlide(currentIndex.i,currentIndex.j);
-
-
-      var w = window.innerWidth,  h = window.innerHeight;
-
-      cameraPosition.x =  - j * w;
-      cameraPosition.y =  - i * h;
-      currentIndex.j = j;
-      currentIndex.i = i;
-
-      body.velocity({
+      //Animation
+      this.body.velocity({
           scale: 0.7,
           opacity: 0.7
         },
-        {
-
-        });
-
-      arrows.velocity({
-        opacity:0
+        {});
+      this.arrows.velocity({
+        opacity: 0
       });
-
-      pages.velocity({
-        scale:.95
+      this.pages.velocity({
+        scale: .95
       });
-
-      gridRoot.velocity({
-        translateX: cameraPosition.x,
-        translateY: cameraPosition.y
+      this.gridRoot.velocity({
+        translateX: self.cameraPosition.x,
+        translateY: self.cameraPosition.y
       }, {
         delay: 300,
         easing: [0.71, -0.58, 0.29, 1.57]
       });
-
-      body.velocity({
+      this.body.velocity({
         scale: 1,
         opacity: 1
       }, {
         delay: 300,
         complete: function () {
-          settings.onAfterPageSlide(currentIndex.i,currentIndex.j);
+          self.settings.onAfterPageSlide(self.currentIndex.i, self.currentIndex.j);
         }
       });
-
-
-      pages.velocity({
-        scale:1
+      this.pages.velocity({
+        scale: 1
       }, {
-        delay:300
+        delay: 300
+      });
+      this.arrows.velocity({
+        opacity: 1
+      }, {
+        delay: 360
       });
 
-      arrows.velocity({
-        opacity:1
-      },{
-        delay:360
-      });
-    };
+      //End of animation
+    },
 
-    //Reposition and Resize pages to adapt to current viewport w/h. Called once after init
-    var redraw = function () {
-      cameraPosition.x = -currentIndex.j * window.innerWidth;
-      cameraPosition.y = -currentIndex.i * window.innerHeight;
-      gridRoot.css({
-        transform: "translateX("+ cameraPosition.x +"px) translateY("+cameraPosition.y+"px)"
+    /* Redraw/Resize the page blocks. Responsiveness is the purpose */
+    redraw: function () {
+      this.cameraPosition.x = -this.currentIndex.j * window.innerWidth;
+      this.cameraPosition.y = -this.currentIndex.i * window.innerHeight;
+      this.gridRoot.css({
+        transform: "translateX(" + this.cameraPosition.x + "px) translateY(" + this.cameraPosition.y + "px)"
       });
 
-
-      return pages.each(function (i, el) {
+      var self = this;
+      return this.pages.each(function (i, el) {
         //x
         // i % 3
         //y
@@ -148,21 +157,20 @@
           position: "fixed",
           overflow: "scroll",
           zIndex: -1,
-          top: Math.floor(i/settings.pagesPerRow) * window.innerHeight,
+          top: Math.floor(i / self.settings.pagesPerRow) * window.innerHeight,
           bottom: 0,
-          left: ((i%settings.pagesPerRow) * window.innerWidth),
+          left: ((i % self.settings.pagesPerRow) * window.innerWidth),
           width: window.innerWidth,
           minHeight: window.innerHeight
         });
       });
-    }();
+    }
 
-    $(window).resize(function () {
-      redraw();
-    });
+  }
 
-    return this;
-  };
+
+  //"use strict";
+  $.Gridify = Gridify;
 
 }(jQuery));
 
